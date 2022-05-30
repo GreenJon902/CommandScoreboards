@@ -1,4 +1,4 @@
-package com.greenjon902.commandscoreboards;
+package com.greenjon902.commandscoreboards.commands;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,7 +30,7 @@ public class EditScoreboardCommand implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "Error: " + ChatColor.DARK_RED + "Invalid line number.");
             return true;
         }
-        
+
         return true;
     }
 }

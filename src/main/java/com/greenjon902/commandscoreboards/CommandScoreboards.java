@@ -1,5 +1,6 @@
 package com.greenjon902.commandscoreboards;
 
+import com.greenjon902.commandscoreboards.commands.EditScoreboardCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CommandScoreboards extends JavaPlugin {
