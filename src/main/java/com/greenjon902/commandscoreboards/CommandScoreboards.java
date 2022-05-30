@@ -12,7 +12,7 @@ public final class CommandScoreboards extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        scoreboardHandler = new ScoreboardHandler();
+        scoreboardHandler = new ScoreboardHandler(this);
 
         getCommand("editglobalscoreboard").setExecutor(new EditGlobalScoreboardCommand());
         getCommand("editglobalscoreboardtitle").setExecutor(new EditGlobalScoreboardTitleCommand());
