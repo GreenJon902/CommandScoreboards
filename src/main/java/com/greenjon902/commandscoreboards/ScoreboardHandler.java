@@ -7,7 +7,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.*;
@@ -16,12 +15,20 @@ public class ScoreboardHandler {
     private final HashMap<UUID, ScoreboardController> playerScoreboardData = new HashMap<>();
     private final ScoreboardController defaultPlayerScoreboard;
 
+    private final File dataFolder;
+    private final File playerScoreboardsFolder;
+    private final File defaultScoreboardFile;
+
     public ScoreboardHandler(CommandScoreboards commandScoreboards) {
-        File dataFolder = commandScoreboards.getDataFolder();
-        File defaultScoreboardFile = new File(dataFolder, "defaultScoreboard.txt");
+        dataFolder = commandScoreboards.getDataFolder();
+        playerScoreboardsFolder = new File(dataFolder, "playerScoreboards");
+        defaultScoreboardFile = new File(dataFolder, "defaultScoreboard.txt");
 
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
+        }
+        if (!playerScoreboardsFolder.exists()) {
+            playerScoreboardsFolder.mkdirs();
         }
 
         try {
@@ -38,7 +45,6 @@ public class ScoreboardHandler {
                 lines.add(fileScanner.next());
             }
             defaultPlayerScoreboard = new ScoreboardController(Component.text(title), lines.toArray(new String[0]));
-            System.out.println(defaultScoreboardFile);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -49,17 +55,42 @@ public class ScoreboardHandler {
         if (playerScoreboardData.containsKey(playerId)) {
             return playerScoreboardData.get(playerId).getScoreboard();
         }
-        return defaultPlayerScoreboard.getScoreboard(); //TODO: Make new scoreboards
+
+
+        File file = new File(playerScoreboardsFolder, playerId.toString() + ".txt");
+        if (file.exists()) {
+            try {
+                Scanner fileScanner = new Scanner(defaultScoreboardFile).useDelimiter("\n");
+
+                String title = fileScanner.next();
+                ArrayList<String> lines = new ArrayList<>();
+                while (fileScanner.hasNext()) {
+                    lines.add(fileScanner.next());
+                }
+                ScoreboardController scoreboardController = new ScoreboardController(Component.text(title), lines.toArray(new String[0]));
+                playerScoreboardData.put(playerId, scoreboardController);
+                return scoreboardController.getScoreboard();
+
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        playerScoreboardData.put(playerId, defaultPlayerScoreboard.clone());
+        return defaultPlayerScoreboard.getScoreboard();
     }
 }
 
 class ScoreboardController {
-    private final Score[] scores = new Score[15];
-    private final String[] scoreNames = new String[15];
+    private final Score[] scores;
+    private final String[] scoreNames;
     private final Scoreboard scoreboard;
     private final Objective objective;
 
-    public ScoreboardController(TextComponent displayName, String[] lines) {
+    public ScoreboardController(Component displayName, String[] lines) {
+        scoreNames =  new String[15];
+        scores = new Score[15];
+
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         objective = scoreboard.registerNewObjective("data", "dummy", displayName);
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -79,7 +110,6 @@ class ScoreboardController {
             scores[i] = score;
             scoreNames[i] = line;
         }
-        System.out.println(Arrays.toString(scores));
     }
 
     public Scoreboard getScoreboard() {
@@ -88,5 +118,9 @@ class ScoreboardController {
 
     public Objective getObjective() {
         return objective;
+    }
+
+    public ScoreboardController clone() {
+        return new ScoreboardController(objective.displayName(), scoreNames);
     }
 }
