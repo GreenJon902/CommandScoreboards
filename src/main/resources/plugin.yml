@@ -14,20 +14,54 @@ commands:
     permission: op
     aliases: editgs, egs
 
-  editplayerscoreboard:
-    description: Edits the scoreboard for a player
-    usage: /<command> <user> <line> <content>
-    permission: op
-    aliases: editps, eps
-
   editglobalscoreboardtitle:
     description: Edits the global scoreboard's title
     usage: /<command> <title>
     permission: op
     aliases: editgst, egst
 
+
+  editplayerscoreboard:
+    description: Edits the scoreboard for a player
+    usage: /<command> <user> <line> <content>
+    permission: op
+    aliases: editps, eps
+
   editplayerscoreboardtitle:
     description: Edits the scoreboard's title for a player
     usage: /<command> <user> <title>
     permission: op
     aliases: editpst, epst
+
+
+  editdefaultplayerscoreboard:
+    description: Edits the default scoreboard for a player
+    usage: /<command> <user> <line> <content>
+    permission: op
+    aliases: editdps, edps
+
+  editdefaultplayerscoreboardtitle:
+    description: Edits the scoreboard's default title for a player
+    usage: /<command> <user> <title>
+    permission: op
+    aliases: editdpst, edpst
+
+
+  resetplayerscoreboard:
+    description: Resets the scoreboard to the default scoreboard for a player
+    usage: /<command> <user>
+    permission: op
+    aliases: rps
+
+
+  switchtoglobalscoreboard:
+    description: Switches the scoreboard for a player to the global scoreboard
+    usage: /<command> <user>
+    permission: op
+    aliases: stgs
+
+  switchtoplayerscoreboard:
+    description: Switches the scoreboard for a player to their player scoreboard
+    usage: /<command> <user>
+    permission: op
+    aliases: stps
