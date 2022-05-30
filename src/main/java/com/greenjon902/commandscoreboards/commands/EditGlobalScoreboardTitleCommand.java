@@ -10,6 +10,9 @@ import org.jetbrains.annotations.NotNull;
 public class EditGlobalScoreboardTitleCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (args.length != 1) {
+            sender.sendMessage(ChatColor.RED + "Error: " + ChatColor.DARK_RED + "/editglobalscoreboardtitle takes 2 arguments.");
+        }
 
         return true;
     }

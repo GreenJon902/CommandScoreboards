@@ -10,6 +10,10 @@ import org.jetbrains.annotations.NotNull;
 public class EditGlobalScoreboardCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (args.length != 2) {
+            sender.sendMessage(ChatColor.RED + "Error: " + ChatColor.DARK_RED + "/editglobalscoreboard takes 2 arguments.");
+        }
+
         int lineNumber;
         try {
             lineNumber = Integer.parseInt(args[1]);

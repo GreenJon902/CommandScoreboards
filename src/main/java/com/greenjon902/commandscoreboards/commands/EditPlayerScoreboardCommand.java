@@ -10,6 +10,10 @@ import org.jetbrains.annotations.NotNull;
 public class EditPlayerScoreboardCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (args.length != 3) {
+            sender.sendMessage(ChatColor.RED + "Error: " + ChatColor.DARK_RED + "/editplayerscoreboard takes 2 arguments.");
+        }
+
         int lineNumber;
         if (Bukkit.getPlayer(args[0]) == null) {
             sender.sendMessage(ChatColor.RED + "Error: " + ChatColor.DARK_RED + "Player not found.");
