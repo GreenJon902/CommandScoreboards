@@ -1,0 +1,14 @@
+name: CommandScoreboards
+version: '${project.version}'
+main: com.greenjon902.commandscoreboards.CommandScoreboards
+api-version: 1.18
+prefix: CommandScoreboards
+authors: [ GreenJon902 ]
+description: Per-player scoreboards that can be controlled by commands
+website: https://github.com/GreenJon902
+
+commands:
+  editscoreboard:
+    description: Edits the scoreboards for a player
+    usage: /<command> <user> <line> <content>
+    permission: op
