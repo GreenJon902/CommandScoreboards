@@ -85,6 +85,32 @@ public class ScoreboardHandler {
         playerScoreboardData.put(playerId, defaultPlayerScoreboard.clone());
         return defaultPlayerScoreboard.getScoreboard();
     }
+
+    public void unloadScoreboard(UUID playerId) {
+        logger.info("Unloading Scoreboard for " + playerId + " (" + Bukkit.getOfflinePlayer(playerId).getName() + ")");
+
+        if (!playerScoreboardData.containsKey(playerId)) {
+            throw new IllegalArgumentException("Player was not loaded");
+        }
+
+        StringBuilder data = new StringBuilder();
+        for (String line : playerScoreboardData.get(playerId).getScoreNames()) {
+            data.append(line);
+            data.append("\n");
+        }
+        String dataString = data.substring(0, data.length()-1);
+
+        try {
+            if (!defaultScoreboardFile.exists()) {
+                FileWriter fileWriter = new FileWriter(defaultScoreboardFile);
+                fileWriter.write(dataString);
+                fileWriter.close();
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
 
 class ScoreboardController {
@@ -128,5 +154,9 @@ class ScoreboardController {
 
     public ScoreboardController clone() {
         return new ScoreboardController(objective.displayName(), scoreNames);
+    }
+
+    public String[] getScoreNames() {
+        return scoreNames.clone();
     }
 }

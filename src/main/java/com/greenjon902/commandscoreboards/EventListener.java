@@ -10,4 +10,9 @@ public class EventListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         event.getPlayer().setScoreboard(CommandScoreboards.getScoreboardHandler().loadScoreboard(event.getPlayer().getUniqueId()));
     }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerLeave(PlayerJoinEvent event) {
+        CommandScoreboards.getScoreboardHandler().unloadScoreboard(event.getPlayer().getUniqueId());
+    }
 }
