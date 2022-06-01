@@ -52,11 +52,6 @@ public class ScoreboardHandler {
     }
 
     public Scoreboard loadScoreboard(UUID playerId) {
-        if (playerScoreboardData.containsKey(playerId)) {
-            return playerScoreboardData.get(playerId).getScoreboard();
-        }
-
-
         File file = new File(playerScoreboardsFolder, playerId.toString() + ".txt");
         if (file.exists()) {
             try {
