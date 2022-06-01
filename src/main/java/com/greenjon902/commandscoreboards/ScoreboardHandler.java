@@ -61,10 +61,10 @@ public class ScoreboardHandler {
     public Scoreboard loadScoreboard(UUID playerId) {
         logger.info("Making scoreboard for " + playerId + " (" + Bukkit.getOfflinePlayer(playerId).getName() + ")");
 
-        File file = new File(playerScoreboardsFolder, playerId.toString() + ".txt");
+        File file = new File(playerScoreboardsFolder, playerId + ".txt");
         if (file.exists()) {
             try {
-                Scanner fileScanner = new Scanner(defaultScoreboardFile).useDelimiter("\n");
+                Scanner fileScanner = new Scanner(file).useDelimiter("\n");
 
                 String title = fileScanner.next();
                 ArrayList<String> lines = new ArrayList<>();
@@ -94,18 +94,19 @@ public class ScoreboardHandler {
         }
 
         StringBuilder data = new StringBuilder();
+        data.append(playerScoreboardData.get(playerId).getObjective().displayName());
+        data.append("\n");
         for (String line : playerScoreboardData.get(playerId).getScoreNames()) {
             data.append(line);
             data.append("\n");
         }
         String dataString = data.substring(0, data.length()-1);
 
+        File file = new File(playerScoreboardsFolder, playerId + ".txt");
         try {
-            if (!defaultScoreboardFile.exists()) {
-                FileWriter fileWriter = new FileWriter(defaultScoreboardFile);
-                fileWriter.write(dataString);
-                fileWriter.close();
-            }
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.write(dataString);
+            fileWriter.close();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
