@@ -14,11 +14,9 @@ import java.util.logging.Logger;
 
 public class ScoreboardHandler {
     private final HashMap<UUID, ScoreboardController> playerScoreboardData = new HashMap<>();
-    private final ScoreboardController defaultPlayerScoreboard;
 
     private final File dataFolder;
     private final File playerScoreboardsFolder;
-    private final File defaultScoreboardFile;
 
     private final Logger logger;
 
@@ -27,39 +25,18 @@ public class ScoreboardHandler {
 
         dataFolder = commandScoreboards.getDataFolder();
         playerScoreboardsFolder = new File(dataFolder, "playerScoreboards");
-        defaultScoreboardFile = new File(dataFolder, "defaultScoreboard.txt");
 
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
         }
+
         if (!playerScoreboardsFolder.exists()) {
             playerScoreboardsFolder.mkdirs();
-        }
-
-        try {
-
-            if (!defaultScoreboardFile.exists()) {
-                logger.info("Making default scoreboard file");
-
-                FileWriter fileWriter = new FileWriter(defaultScoreboardFile);
-                fileWriter.write("Example Title\nIt can hold 15 lines\n\n\n\n\n\n\n\n\n\nscoreboard\nexample\nan\nis\nThis");
-                fileWriter.close();
-            }
-            Scanner fileScanner = new Scanner(defaultScoreboardFile).useDelimiter("\n");
-            String title = fileScanner.next();
-            ArrayList<String> lines = new ArrayList<>();
-            while (fileScanner.hasNext()) {
-                lines.add(fileScanner.next());
-            }
-            defaultPlayerScoreboard = new ScoreboardController(Component.text(title), lines.toArray(new String[0]));
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
     public Scoreboard loadScoreboard(UUID playerId) {
-        logger.info("Making scoreboard for " + playerId + " (" + Bukkit.getOfflinePlayer(playerId).getName() + ")");
+        logger.info("Loading scoreboard for " + playerId + " (" + Bukkit.getOfflinePlayer(playerId).getName() + ")");
 
         File file = new File(playerScoreboardsFolder, playerId + ".txt");
         if (file.exists()) {
@@ -80,10 +57,10 @@ public class ScoreboardHandler {
             }
         }
 
-        logger.info("No scoreboard found, copying default one");
+        logger.info("No scoreboard found, making new one");
 
-        playerScoreboardData.put(playerId, defaultPlayerScoreboard.clone());
-        return defaultPlayerScoreboard.getScoreboard();
+        playerScoreboardData.put(playerId, ScoreboardController.newEmptyScoreboardController());
+        return playerScoreboardData.get(playerId).getScoreboard();
     }
 
     public void unloadScoreboard(UUID playerId) {
@@ -121,18 +98,17 @@ class ScoreboardController {
     private final Objective objective;
 
     public ScoreboardController(Component displayName, String[] lines) {
-        scoreNames =  new String[15];
-        scores = new Score[15];
+        scoreNames =  new String[lines.length];
+        scores = new Score[lines.length];
 
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         objective = scoreboard.registerNewObjective("data", "dummy", displayName);
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        if (!(lines.length == 15)) {
-            throw new IllegalArgumentException("Scoreboard controller takes a line length of 15 only");
+        if (lines.length > 15) {
+            throw new IllegalArgumentException("Scoreboard controller takes a maximum line length of 15");
         }
         for (int i=0; i<lines.length; i++) {
-
             String line = lines[i];
             while (Arrays.asList(scoreNames).contains(line)) {
                 line = line + " ";
@@ -145,16 +121,16 @@ class ScoreboardController {
         }
     }
 
+    public static ScoreboardController newEmptyScoreboardController() {
+        return new ScoreboardController(Component.text(""), new String[] {}); //Make empty list
+    }
+
     public Scoreboard getScoreboard() {
         return scoreboard;
     }
 
     public Objective getObjective() {
         return objective;
-    }
-
-    public ScoreboardController clone() {
-        return new ScoreboardController(objective.displayName(), scoreNames);
     }
 
     public String[] getScoreNames() {

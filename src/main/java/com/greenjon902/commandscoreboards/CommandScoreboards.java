@@ -14,15 +14,9 @@ public final class CommandScoreboards extends JavaPlugin {
     public void onEnable() {
         scoreboardHandler = new ScoreboardHandler(this);
 
-        getCommand("editglobalscoreboard").setExecutor(new EditGlobalScoreboardCommand());
-        getCommand("editglobalscoreboardtitle").setExecutor(new EditGlobalScoreboardTitleCommand());
         getCommand("editplayerscoreboard").setExecutor(new EditPlayerScoreboardCommand());
         getCommand("editplayerscoreboardtitle").setExecutor(new EditPlayerScoreboardTitleCommand());
-        getCommand("editdefaultplayerscoreboard").setExecutor(new EditDefaultPlayerScoreboardCommand());
-        getCommand("editdefaultplayerscoreboardtitle").setExecutor(new EditDefaultPlayerScoreboardTitleCommand());
         getCommand("resetplayerscoreboard").setExecutor(new ResetPlayerScoreboard());
-        getCommand("switchtoglobalscoreboard").setExecutor(new SwitchToGlobalScoreboard());
-        getCommand("switchtoplayerscoreboard").setExecutor(new SwitchToPlayerScoreboard());
         getServer().getPluginManager().registerEvents(new EventListener(), this);
     }
 
