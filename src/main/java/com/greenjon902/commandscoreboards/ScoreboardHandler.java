@@ -93,6 +93,10 @@ public class ScoreboardHandler {
     public void setScoreboardLine(UUID playerId, int line, String value) {
         playerScoreboardData.get(playerId).setLine(line, value);
     }
+
+    public void setScoreboardTitle(UUID playerId, String value) {
+        playerScoreboardData.get(playerId).setDisplayName(value);
+    }
 }
 
 class ScoreboardController {
@@ -153,6 +157,11 @@ class ScoreboardController {
         }
 
         scoreNames[line] = value;
+        updateScoreboard();
+    }
+
+    public void setDisplayName(String value) {
+        displayName = value;
         updateScoreboard();
     }
 
