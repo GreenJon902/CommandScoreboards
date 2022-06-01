@@ -48,7 +48,7 @@ public class ScoreboardHandler {
                 while (fileScanner.hasNext()) {
                     lines.add(fileScanner.next());
                 }
-                ScoreboardController scoreboardController = new ScoreboardController(Component.text(title), lines.toArray(new String[0]));
+                ScoreboardController scoreboardController = new ScoreboardController(title, lines.toArray(new String[0]));
                 playerScoreboardData.put(playerId, scoreboardController);
                 return scoreboardController.getScoreboard();
 
@@ -89,40 +89,34 @@ public class ScoreboardHandler {
             throw new RuntimeException(e);
         }
     }
+
+    public void setScoreboardLine(UUID playerId, int line, String value) {
+        playerScoreboardData.get(playerId).setLine(line, value);
+    }
 }
 
 class ScoreboardController {
-    private final Score[] scores;
-    private final String[] scoreNames;
+    private String displayName;
+    private String[] scoreNames;
     private final Scoreboard scoreboard;
-    private final Objective objective;
+    private Objective objective;
 
-    public ScoreboardController(Component displayName, String[] lines) {
-        scoreNames =  new String[lines.length];
-        scores = new Score[lines.length];
+    public ScoreboardController(String displayName, String[] lines) {
+        this.displayName = displayName;
+
+        scoreNames =  lines;
 
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        objective = scoreboard.registerNewObjective("data", "dummy", displayName);
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         if (lines.length > 15) {
             throw new IllegalArgumentException("Scoreboard controller takes a maximum line length of 15");
         }
-        for (int i=0; i<lines.length; i++) {
-            String line = lines[i];
-            while (Arrays.asList(scoreNames).contains(line)) {
-                line = line + " ";
-            }
 
-            Score score = objective.getScore(line);
-            score.setScore(i);
-            scores[i] = score;
-            scoreNames[i] = line;
-        }
+        updateScoreboard();
     }
 
     public static ScoreboardController newEmptyScoreboardController() {
-        return new ScoreboardController(Component.text(""), new String[] {}); //Make empty list
+        return new ScoreboardController("", new String[] {}); //Make empty list
     }
 
     public Scoreboard getScoreboard() {
@@ -135,5 +129,51 @@ class ScoreboardController {
 
     public String[] getScoreNames() {
         return scoreNames.clone();
+    }
+
+    public void setLine(int line, String value) {
+        if (line < 0 || line > 15) {
+            throw new IllegalArgumentException("Scoreboard's have up to 14 lines, starting at 0");
+        }
+
+        if ((scoreNames.length - 1) < line) {
+            String[] scoreNames2 = new String[line + 1];
+            System.arraycopy(scoreNames, 0, scoreNames2, 0, scoreNames.length);
+            scoreNames = scoreNames2;
+
+            for (int i=0; i<scoreNames.length; i++) {
+                String scoreName = scoreNames[i];
+
+                if (scoreName == null) {
+                    scoreName = "";
+                }
+
+                scoreNames[i] = scoreName;
+            }
+        }
+
+        scoreNames[line] = value;
+        updateScoreboard();
+    }
+
+    public void updateScoreboard() {
+        if (scoreboard.getObjective("data") != null) {
+            objective.unregister();
+        }
+
+        objective = scoreboard.registerNewObjective("data", "dummy", displayName);
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        ArrayList<String> alreadyScores = new ArrayList<>(); // list of score names that there already are bc can't be duplicates
+        for (int i=0; i<scoreNames.length; i++) {
+            String line = scoreNames[i];
+            while (alreadyScores.contains(line)) {
+                line = line + " ";
+            }
+
+            Score score = objective.getScore(line);
+            score.setScore(i);
+            alreadyScores.add(line);
+        }
     }
 }
