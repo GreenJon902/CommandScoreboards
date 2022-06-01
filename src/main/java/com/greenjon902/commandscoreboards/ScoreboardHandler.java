@@ -10,6 +10,7 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class ScoreboardHandler {
     private final HashMap<UUID, ScoreboardController> playerScoreboardData = new HashMap<>();
@@ -19,7 +20,11 @@ public class ScoreboardHandler {
     private final File playerScoreboardsFolder;
     private final File defaultScoreboardFile;
 
+    private final Logger logger;
+
     public ScoreboardHandler(CommandScoreboards commandScoreboards) {
+        logger = commandScoreboards.getLogger();
+
         dataFolder = commandScoreboards.getDataFolder();
         playerScoreboardsFolder = new File(dataFolder, "playerScoreboards");
         defaultScoreboardFile = new File(dataFolder, "defaultScoreboard.txt");
@@ -34,6 +39,8 @@ public class ScoreboardHandler {
         try {
 
             if (!defaultScoreboardFile.exists()) {
+                logger.info("Making default scoreboard file");
+
                 FileWriter fileWriter = new FileWriter(defaultScoreboardFile);
                 fileWriter.write("Example Title\nIt can hold 15 lines\n\n\n\n\n\n\n\n\n\nscoreboard\nexample\nan\nis\nThis");
                 fileWriter.close();
@@ -52,6 +59,8 @@ public class ScoreboardHandler {
     }
 
     public Scoreboard loadScoreboard(UUID playerId) {
+        logger.info("Making scoreboard for " + playerId + " (" + Bukkit.getOfflinePlayer(playerId).getName() + ")");
+
         File file = new File(playerScoreboardsFolder, playerId.toString() + ".txt");
         if (file.exists()) {
             try {
@@ -70,6 +79,8 @@ public class ScoreboardHandler {
                 throw new RuntimeException(e);
             }
         }
+
+        logger.info("No scoreboard found, copying default one");
 
         playerScoreboardData.put(playerId, defaultPlayerScoreboard.clone());
         return defaultPlayerScoreboard.getScoreboard();
